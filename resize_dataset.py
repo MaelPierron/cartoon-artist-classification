@@ -1,30 +1,35 @@
 #!/usr/bin/env python3
 """
-Image Dataset Resizer
+Dataset Image Processor: Resize + Rename
 
-Resizes all images in a dataset folder while preserving the folder structure.
-Each class should be a subfolder in the input directory.
+This script processes a dataset structured as:
+    root/
+        class1/
+            img1.jpg
+            img2.png
+        class2/
+            img3.jpg
+            ...
 
 Features:
-- Resizes images to a fixed size (default: 224x224)
-- Preserves aspect ratio with padding
-- Supports .jpg, .jpeg, .png, .webp
-- Skips and logs corrupted/unreadable files
-- Displays a progress bar
-- Prints a summary (total processed, skipped, per-class count)
+- Resizes images to a fixed size (default: 224x224) with padding
+- Renames images to: {class_name}_{index:04d}.ext
+- Index restarts at 1 for each class
+- Preserves original extension
+- Skips files if target name already exists
+- Dry-run mode for renaming
+- Skips corrupted/unreadable images
+- Shows progress bar
+- Prints summary (total processed, renamed, skipped, per-class)
 
 Dependencies:
-- Pillow
-- tqdm
-
-Install:
     pip install pillow tqdm
 
 Usage:
-    python resize_dataset.py input_dataset output_dataset
+    python resize_dataset.py data/input_dataset data/output_dataset
+    python resize_dataset.py data/input_dataset data/output_dataset --dry-run
 
-Example:
-    python resize_dataset.py data/train data_resized/train
+
 """
 
 import os
@@ -36,106 +41,108 @@ from collections import defaultdict
 # ==============================
 # CONFIGURATION
 # ==============================
-TARGET_SIZE = (224, 224)  # (width, height)
-PADDING_COLOR = (0, 0, 0)  # Black padding (use (255,255,255) for white)
-
+TARGET_SIZE = (224, 224)
+PADDING_COLOR = (0, 0, 0)  # (255,255,255) for white
 SUPPORTED_EXTENSIONS = (".jpg", ".jpeg", ".png", ".webp")
 
 
 # ==============================
-# CORE FUNCTIONS
+# IMAGE PROCESSING
 # ==============================
 def resize_with_padding(img, target_size, padding_color):
-    """
-    Resize an image while preserving aspect ratio and add padding.
-
-    Args:
-        img (PIL.Image): Input image
-        target_size (tuple): (width, height)
-        padding_color (tuple): RGB color for padding
-
-    Returns:
-        PIL.Image: Resized and padded image
-    """
+    """Resize while keeping aspect ratio + padding."""
     target_w, target_h = target_size
-    original_w, original_h = img.size
+    w, h = img.size
 
-    # Compute scaling factor
-    scale = min(target_w / original_w, target_h / original_h)
-    new_w = int(original_w * scale)
-    new_h = int(original_h * scale)
+    scale = min(target_w / w, target_h / h)
+    new_w, new_h = int(w * scale), int(h * scale)
 
-    # Resize image
     img_resized = img.resize((new_w, new_h), Image.LANCZOS)
-
-    # Create new image with padding
     new_img = Image.new("RGB", (target_w, target_h), padding_color)
 
-    # Center the image
     paste_x = (target_w - new_w) // 2
     paste_y = (target_h - new_h) // 2
-
     new_img.paste(img_resized, (paste_x, paste_y))
 
     return new_img
 
 
-def process_dataset(input_dir, output_dir):
-    """
-    Process the dataset and resize all images.
-
-    Args:
-        input_dir (str): Path to input dataset
-        output_dir (str): Path to output dataset
-    """
+# ==============================
+# MAIN PROCESS
+# ==============================
+def process_dataset(input_dir, output_dir, dry_run=False):
     total_processed = 0
+    total_renamed = 0
     total_skipped = 0
+
     per_class_count = defaultdict(int)
 
-    # Gather all image paths
-    image_paths = []
-    for root, _, files in os.walk(input_dir):
-        for file in files:
-            if file.lower().endswith(SUPPORTED_EXTENSIONS):
-                image_paths.append(os.path.join(root, file))
+    # Iterate over class folders
+    for class_name in sorted(os.listdir(input_dir)):
+        class_input_path = os.path.join(input_dir, class_name)
 
-    # Progress bar
-    for img_path in tqdm(image_paths, desc="Processing images"):
-        try:
-            # Open image
-            with Image.open(img_path) as img:
-                img = img.convert("RGB")
+        if not os.path.isdir(class_input_path):
+            continue
 
-                # Resize with padding
-                img_resized = resize_with_padding(
-                    img, TARGET_SIZE, PADDING_COLOR
-                )
+        class_output_path = os.path.join(output_dir, class_name)
+        os.makedirs(class_output_path, exist_ok=True)
 
-            # Compute output path
-            rel_path = os.path.relpath(img_path, input_dir)
-            output_path = os.path.join(output_dir, rel_path)
+        # Collect images in this class
+        images = [
+            f for f in sorted(os.listdir(class_input_path))
+            if f.lower().endswith(SUPPORTED_EXTENSIONS)
+        ]
 
-            # Ensure output directory exists
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        index = 1
 
-            # Save image
-            img_resized.save(output_path)
+        for filename in tqdm(images, desc=f"{class_name}", leave=False):
+            input_path = os.path.join(class_input_path, filename)
 
-            # Update counters
-            total_processed += 1
-            class_name = rel_path.split(os.sep)[0]
-            per_class_count[class_name] += 1
+            ext = os.path.splitext(filename)[1].lower()
+            new_name = f"{class_name}_{index:04d}{ext}"
+            output_path = os.path.join(class_output_path, new_name)
 
-        except (UnidentifiedImageError, OSError, ValueError) as e:
-            print(f"[WARNING] Skipping file: {img_path} ({e})")
-            total_skipped += 1
+            # Check overwrite
+            if os.path.exists(output_path):
+                print(f"[SKIP] Exists: {output_path}")
+                total_skipped += 1
+                index += 1
+                continue
+
+            if dry_run:
+                print(f"[DRY-RUN] {input_path} -> {output_path}")
+                total_renamed += 1
+                per_class_count[class_name] += 1
+                index += 1
+                continue
+
+            try:
+                with Image.open(input_path) as img:
+                    img = img.convert("RGB")
+                    img_resized = resize_with_padding(
+                        img, TARGET_SIZE, PADDING_COLOR
+                    )
+
+                img_resized.save(output_path)
+
+                total_processed += 1
+                total_renamed += 1
+                per_class_count[class_name] += 1
+
+            except (UnidentifiedImageError, OSError, ValueError) as e:
+                print(f"[WARNING] Skipping: {input_path} ({e})")
+                total_skipped += 1
+
+            index += 1
 
     # ==============================
     # SUMMARY
     # ==============================
     print("\n===== SUMMARY =====")
     print(f"Total processed: {total_processed}")
+    print(f"Total renamed:   {total_renamed}")
     print(f"Total skipped:   {total_skipped}")
+
     print("\nPer-class counts:")
     for cls, count in per_class_count.items():
         print(f"  {cls}: {count}")
@@ -145,18 +152,19 @@ def process_dataset(input_dir, output_dir):
 # ENTRY POINT
 # ==============================
 def main():
-    if len(sys.argv) != 3:
-        print("Usage: python resize_dataset.py <input_dir> <output_dir>")
+    if len(sys.argv) < 3:
+        print("Usage: python script.py <input_dir> <output_dir> [--dry-run]")
         sys.exit(1)
 
     input_dir = sys.argv[1]
     output_dir = sys.argv[2]
+    dry_run = "--dry-run" in sys.argv
 
     if not os.path.isdir(input_dir):
-        print(f"Error: Input directory does not exist: {input_dir}")
+        print(f"Error: Input directory not found: {input_dir}")
         sys.exit(1)
 
-    process_dataset(input_dir, output_dir)
+    process_dataset(input_dir, output_dir, dry_run)
 
 
 if __name__ == "__main__":
