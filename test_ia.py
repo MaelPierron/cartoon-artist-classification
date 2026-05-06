@@ -8,7 +8,7 @@ model_path = "model.pth"
 image_path = "test.jpg"
 
 # ⚠️ DOIT être le même ordre que train_dataset.classes
-class_names = ['project_moon','steins_gate']
+class_names = ['Ghibli','One_piece','project_moon','steins_gate']
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
