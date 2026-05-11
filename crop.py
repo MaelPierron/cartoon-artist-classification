@@ -49,7 +49,7 @@ def process_folder(input_dir, output_dir):
 
 
 
-input_folder = "test_images"
-output_folder = "arrivee"
+input_folder = "datasetencours"
+output_folder = "datasetfini"
 
 process_folder(input_folder, output_folder)
