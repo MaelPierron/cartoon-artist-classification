@@ -3,7 +3,6 @@ from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import SelectKBest, f_classif
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 df = pd.read_csv("features.csv")
 
