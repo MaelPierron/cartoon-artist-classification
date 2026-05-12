@@ -12,21 +12,21 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 
 df = pd.read_csv("features.csv")
 
-# 🔥 Features / labels
+# Features / labels
 X = df.drop(columns=["label"]).values
 y = df["label"].values
 
-# 🔥 1. Normalisation
+# 1. Normalisation
 scaler = StandardScaler()
-X = scaler.fit_transform(X)
+X = scaler.fit_transform(X) # pour harmoniser les distances entre features
 
-# 🔥 2. Sélection des meilleures features
+# 2. Sélection des meilleures features
 selector = SelectKBest(score_func=f_classif, k=400)
 X = selector.fit_transform(X, y)
 
 print("Shape après sélection :", X.shape)
 
-# 🔥 3. Split train/test
+# 3. Split train/test
 X_train, X_test, y_train, y_test = train_test_split(
     X,
     y,
@@ -35,20 +35,20 @@ X_train, X_test, y_train, y_test = train_test_split(
     stratify=y
 )
 
-# 🔥 4. SVM
+# 4. SVM
 model = SVC(
-    kernel='rbf',
-    C=10,
+    kernel='rbf', # kernel gaussien il projette les données dans un espace plus grand 
+    C=10, # paramètre de marge, plus il est petit plus il est précis
     gamma='scale'
-)
+) # si deux points sont proches (faible distance), on sera proche de 1, et de 0 si l'inverse
 
 print("Entraînement du SVM...")
-model.fit(X_train, y_train)
+model.fit(X_train, y_train) # construction de l'hyperplan optimal
 
-# 🔥 5. Prédictions
-y_pred = model.predict(X_test)
+# 5. Prédictions
+y_pred = model.predict(X_test) 
 
-# 🔥 6. Évaluation
+# 6. Évaluation
 accuracy = accuracy_score(y_test, y_pred)
 
 print("\nAccuracy :", accuracy)
@@ -59,13 +59,13 @@ print("\nAccuracy :", accuracy)
 # print("\nConfusion matrix :")
 # print(confusion_matrix(y_test, y_pred))
 
-# 🔥 Calcul confusion matrix
+# Calcul confusion matrix
 cm = confusion_matrix(y_test, y_pred)
 
-# 🔥 Conversion en pourcentage
+# Conversion en pourcentage
 cm_percent = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
 
-# 🔥 Affichage
+# Affichage
 fig, ax = plt.subplots(figsize=(8,6))
 
 disp = ConfusionMatrixDisplay(
