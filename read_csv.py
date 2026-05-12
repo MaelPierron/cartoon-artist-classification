@@ -10,21 +10,21 @@ df = pd.read_csv("features.csv")
 X = df.drop(columns=["label"]).values
 y = df["label"]
 
-# 🔥 1. Normalisation
+#  1. Normalisation
 X = StandardScaler().fit_transform(X)
 
-# 🔥 2. Sélection des meilleures features
+#  2. Sélection des meilleures features
 selector = SelectKBest(score_func=f_classif, k=400)
 X_reduced = selector.fit_transform(X, y)
 
-# 🔥 3. PCA
+#  3. PCA
 pca = PCA(n_components=2)
 X_2d = pca.fit_transform(X_reduced)
 
 # Labels numériques
 labels = pd.factorize(y)[0]
 
-# 🔥 Affichage
+#  Affichage
 plt.figure(figsize=(8,6))
 
 scatter = plt.scatter(
