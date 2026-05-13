@@ -9,3 +9,5 @@ __pycache__/
 *.pth
 *.pkl
 *.h5
+
+*.csv
