@@ -11,7 +11,7 @@ y = df["label"] #ici on récupère les labels
 
 X = StandardScaler().fit_transform(X) #on normalise les features (essentiel)
 
-selector = SelectKBest(score_func=f_classif, k=400) # sélection des 400 meilleurs features (ceux qui maximisent les différences entre les classes)
+selector = SelectKBest(score_func=f_classif, k=25) # sélection des k meilleurs features (ceux qui maximisent les différences entre les classes)
 X_reduced = selector.fit_transform(X, y)
 
 X_2d = TSNE(n_components=2, perplexity=30).fit_transform(X_reduced) # application du TNSE

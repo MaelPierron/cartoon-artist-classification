@@ -13,7 +13,7 @@ y = df["label"]
 X = StandardScaler().fit_transform(X)
 
 # 2. sélection des features
-selector = SelectKBest(score_func=f_classif, k=400)
+selector = SelectKBest(score_func=f_classif, k=25)
 X_reduced = selector.fit_transform(X, y)
 
 # 3. t-SNE en 3D
