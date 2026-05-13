@@ -8,7 +8,7 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 from sklearn.pipeline import make_pipeline
 
-# 🔧 Chargement
+#  Chargement
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 csv_path = os.path.join(BASE_DIR, "features.csv")
 
@@ -17,13 +17,13 @@ df = pd.read_csv(csv_path)
 X = df.drop(columns=["label"]).values
 y = df["label"].values
 
-# 🔥 Encodage des labels
+#  Encodage des labels
 from sklearn.preprocessing import LabelEncoder
 
 encoder = LabelEncoder()
 y_encoded = encoder.fit_transform(y)
 
-# 🔥 Split
+#  Split
 X_train, X_test, y_train, y_test = train_test_split(
     X,
     y_encoded,
@@ -32,27 +32,27 @@ X_train, X_test, y_train, y_test = train_test_split(
     stratify=y_encoded
 )
 
-# 🔥 Normalisation
+#  Normalisation
 scaler = StandardScaler()
 
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
-# # 🔥 PLS
+# #  PLS
 # pls = PLSRegression(n_components=20)
 
 # X_train_pls = pls.fit_transform(X_train, y_train)[0]
 # X_test_pls = pls.transform(X_test)
 
-# # 🔥 SVM
+# #  SVM
 # svm = SVC(kernel='rbf', C=10)
 
 # svm.fit(X_train_pls, y_train)
 
-# # 🔥 Prédictions
+# #  Prédictions
 # y_pred = svm.predict(X_test_pls)
 
-# # 🔥 Accuracy
+# #  Accuracy
 # acc = accuracy_score(y_test, y_pred)
 
 # print("Accuracy :", acc)
