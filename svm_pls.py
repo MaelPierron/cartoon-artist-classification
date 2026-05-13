@@ -10,6 +10,7 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.manifold import TSNE
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -49,30 +50,30 @@ X_test = scaler.transform(X_test)
 best_acc = 0
 best_n = 0
 
-for n in [2, 5, 7, 10, 20, 30, 50]:
+# for n in [2, 5, 7, 10, 20, 30, 50]:
 
-    pls = PLSRegression(n_components=n)
+#     pls = PLSRegression(n_components=n)
 
-    X_train_pls = pls.fit_transform(X_train, y_train_pls)[0]
-    X_test_pls = pls.transform(X_test)
+#     X_train_pls = pls.fit_transform(X_train, y_train_pls)[0]
+#     X_test_pls = pls.transform(X_test)
 
-    svm = SVC(kernel='rbf', C=10)
+#     svm = SVC(kernel='rbf', C=10)
 
-    svm.fit(X_train_pls, y_train_svm)
+#     svm.fit(X_train_pls, y_train_svm)
 
-    y_pred = svm.predict(X_test_pls)
+#     y_pred = svm.predict(X_test_pls)
 
-    acc = accuracy_score(y_test_svm, y_pred)
+#     acc = accuracy_score(y_test_svm, y_pred)
 
-    print(f"{n} composantes -> {acc:.4f}")
+#     print(f"{n} composantes -> {acc:.4f}")
 
-    if acc > best_acc:
-        best_acc = acc
-        best_n = n
+#     if acc > best_acc:
+#         best_acc = acc
+#         best_n = n
 
-print("\nMeilleur résultat :")
-print(best_n, "composantes")
-print("Accuracy :", best_acc)
+# print("\nMeilleur résultat :")
+# print(best_n, "composantes")
+# print("Accuracy :", best_acc)
 
 pls = PLSRegression(n_components=30)
 
@@ -85,19 +86,47 @@ svm.fit(X_train_pls, y_train_svm)
 
 y_pred = svm.predict(X_test_pls)
 
-acc = accuracy_score(y_test_svm, y_pred)
+# t-SNE sur les features PLS (test set)
+tsne = TSNE(n_components=2, perplexity=30, random_state=42)
 
-cm = confusion_matrix(y_test_svm, y_pred)
+X_tsne = tsne.fit_transform(X_test_pls)
 
-cm_percent = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
+# affichage
+plt.figure(figsize=(8,6))
 
-disp = ConfusionMatrixDisplay(
-    confusion_matrix=cm_percent,
-    display_labels=label_encoder.classes_
+scatter = plt.scatter(
+    X_tsne[:,0],
+    X_tsne[:,1],
+    c=y_test_svm,
+    cmap='tab10',
+    alpha=0.7
 )
 
-disp.plot(cmap='Blues', values_format=".1f")
-plt.title("Confusion Matrix PLS + SVM (%)")
-plt.xticks(rotation=45)
+# légende propre
+handles, _ = scatter.legend_elements()
+labels = label_encoder.classes_
+
+plt.legend(handles, labels, title="Classes", bbox_to_anchor=(1.05, 1))
+
+plt.title("t-SNE après PLS (test set)")
+plt.xlabel("Dim 1")
+plt.ylabel("Dim 2")
+
 plt.show()
+
+# acc = accuracy_score(y_test_svm, y_pred)
+
+# cm = confusion_matrix(y_test_svm, y_pred)
+
+# cm_percent = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
+
+# disp = ConfusionMatrixDisplay(
+#     confusion_matrix=cm_percent,
+#     display_labels=label_encoder.classes_
+# )
+
+# disp.plot(cmap='Blues', values_format=".1f")
+# plt.title("Confusion Matrix PLS + SVM (%)")
+# plt.xticks(rotation=45)
+# plt.show()
 
