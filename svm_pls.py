@@ -50,30 +50,30 @@ X_test = scaler.transform(X_test)
 best_acc = 0
 best_n = 0
 
-# for n in [2, 5, 7, 10, 20, 30, 50]:
+for n in [45, 50, 55]:
 
-#     pls = PLSRegression(n_components=n)
+    pls = PLSRegression(n_components=n)
 
-#     X_train_pls = pls.fit_transform(X_train, y_train_pls)[0]
-#     X_test_pls = pls.transform(X_test)
+    X_train_pls = pls.fit_transform(X_train, y_train_pls)[0]
+    X_test_pls = pls.transform(X_test)
 
-#     svm = SVC(kernel='rbf', C=10)
+    svm = SVC(kernel='rbf', C=10)
 
-#     svm.fit(X_train_pls, y_train_svm)
+    svm.fit(X_train_pls, y_train_svm)
 
-#     y_pred = svm.predict(X_test_pls)
+    y_pred = svm.predict(X_test_pls)
 
-#     acc = accuracy_score(y_test_svm, y_pred)
+    acc = accuracy_score(y_test_svm, y_pred)
 
-#     print(f"{n} composantes -> {acc:.4f}")
+    print(f"{n} composantes -> {acc:.4f}")
 
-#     if acc > best_acc:
-#         best_acc = acc
-#         best_n = n
+    if acc > best_acc:
+        best_acc = acc
+        best_n = n
 
-# print("\nMeilleur résultat :")
-# print(best_n, "composantes")
-# print("Accuracy :", best_acc)
+print("\nMeilleur résultat :")
+print(best_n, "composantes")
+print("Accuracy :", best_acc)
 
 pls = PLSRegression(n_components=30)
 
