@@ -50,32 +50,32 @@ X_test = scaler.transform(X_test)
 best_acc = 0
 best_n = 0
 
-for n in [45, 50, 55, 60, 65]:
+# for n in [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75]:
 
-    pls = PLSRegression(n_components=n)
+#     pls = PLSRegression(n_components=n)
 
-    X_train_pls = pls.fit_transform(X_train, y_train_pls)[0]
-    X_test_pls = pls.transform(X_test)
+#     X_train_pls = pls.fit_transform(X_train, y_train_pls)[0]
+#     X_test_pls = pls.transform(X_test)
 
-    svm = SVC(kernel='rbf', C=10)
+#     svm = SVC(kernel='rbf', C=10)
 
-    svm.fit(X_train_pls, y_train_svm)
+#     svm.fit(X_train_pls, y_train_svm)
 
-    y_pred = svm.predict(X_test_pls)
+#     y_pred = svm.predict(X_test_pls)
 
-    acc = accuracy_score(y_test_svm, y_pred)
+#     acc = accuracy_score(y_test_svm, y_pred)
 
-    print(f"{n} composantes -> {acc:.4f}")
+#     print(f"{n} composantes -> {acc:.4f}")
 
-    if acc > best_acc:
-        best_acc = acc
-        best_n = n
+#     if acc > best_acc:
+#         best_acc = acc
+#         best_n = n
 
-print("\nMeilleur résultat :")
-print(best_n, "composantes")
-print("Accuracy :", best_acc)
+# print("\nMeilleur résultat :")
+# print(best_n, "composantes")
+# print("Accuracy :", best_acc)
 
-pls = PLSRegression(n_components=30)
+pls = PLSRegression(n_components=15)
 
 X_train_pls = pls.fit_transform(X_train, y_train_pls)[0]
 X_test_pls = pls.transform(X_test)
@@ -114,19 +114,19 @@ plt.ylabel("Dim 2")
 
 plt.show()
 
-# acc = accuracy_score(y_test_svm, y_pred)
+acc = accuracy_score(y_test_svm, y_pred)
 
-# cm = confusion_matrix(y_test_svm, y_pred)
+cm = confusion_matrix(y_test_svm, y_pred)
 
-# cm_percent = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
+cm_percent = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
 
-# disp = ConfusionMatrixDisplay(
-#     confusion_matrix=cm_percent,
-#     display_labels=label_encoder.classes_
-# )
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm_percent,
+    display_labels=label_encoder.classes_
+)
 
-# disp.plot(cmap='Blues', values_format=".1f")
-# plt.title("Confusion Matrix PLS + SVM (%)")
-# plt.xticks(rotation=45)
-# plt.show()
+disp.plot(cmap='Blues', values_format=".1f")
+plt.title("Confusion Matrix PLS + SVM (%)")
+plt.xticks(rotation=45)
+plt.show()
 

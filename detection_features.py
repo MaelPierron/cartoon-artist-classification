@@ -21,7 +21,7 @@ def extract_features(image_path):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # 1. HOG FEATURES (formes / contours)
-    hog_features = hog(gray, pixels_per_cell=(32, 32), cells_per_block=(2, 2), visualize=False)
+    hog_features = hog(gray, pixels_per_cell=(64, 64), cells_per_block=(2, 2), visualize=False)
 
     # 2. LBP FEATURES (texture locale)
     lbp = local_binary_pattern(gray, P=8, R=1)
