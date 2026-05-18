@@ -50,7 +50,7 @@ X_test = scaler.transform(X_test)
 best_acc = 0
 best_n = 0
 
-for n in [45, 50, 55]:
+for n in [45, 50, 55, 60, 65]:
 
     pls = PLSRegression(n_components=n)
 
