@@ -75,7 +75,7 @@ while np.abs(previous_loss-current_loss)>thresh:
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
-            # 🔥 sauvegarde
+            # sauvegarde
             all_labels.extend(labels.cpu().numpy())
             all_predictions.extend(predicted.cpu().numpy())
 
