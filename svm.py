@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import SelectKBest, f_classif
@@ -21,7 +22,7 @@ scaler = StandardScaler()
 X = scaler.fit_transform(X) # pour harmoniser les distances entre features
 
 # 2. Sélection des meilleures features
-selector = SelectKBest(score_func=f_classif, k=400)
+selector = SelectKBest(score_func=f_classif, k=15)
 X = selector.fit_transform(X, y)
 
 print("Shape après sélection :", X.shape)
@@ -39,7 +40,8 @@ X_train, X_test, y_train, y_test = train_test_split(
 model = SVC(
     kernel='rbf', # kernel gaussien il projette les données dans un espace plus grand 
     C=10, # paramètre de marge, plus il est petit plus il est précis
-    gamma='scale'
+    gamma='scale', 
+    probability=True
 ) # si deux points sont proches (faible distance), on sera proche de 1, et de 0 si l'inverse
 
 print("Entraînement du SVM...")
@@ -81,3 +83,8 @@ disp.plot(
 
 plt.title("Confusion Matrix (%)")
 plt.show()
+
+joblib.dump(scaler,   "scaler.pkl")
+joblib.dump(selector, "selector.pkl")
+joblib.dump(model,    "model.pkl")
+print("\nScaler, selector et modèle sauvegardés (.pkl)")
