@@ -46,9 +46,10 @@ def extract_features(image_path):
     return features
 
 
-X = []
-y = []
+X = [] # les features
+y = [] # Les classes
 
+# Traitement des différentes classes
 for class_name in os.listdir(DATASET_PATH):
 
     class_path = os.path.join(DATASET_PATH, class_name)

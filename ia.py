@@ -33,7 +33,7 @@ model = model.to(device)
 criterion = nn.CrossEntropyLoss() # choix, de la loss, EntropyLoss classique pour classification d'images
 optimizer = optim.Adam(model.parameters(), lr=1e-4)
 
-
+# Traitement de l'IA
 previous_loss = 0
 current_loss = 1000
 thresh = 0.2

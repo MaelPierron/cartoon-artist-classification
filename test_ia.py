@@ -8,14 +8,13 @@ model_path = "model.pth"
 test_folder = "tests_squares"
 
 
-# Doit être le même ordre que train_dataset.classes
+# Doit être dans le même ordre que train_dataset.classes
 class_names = ['Ghibli','One_piece','project_moon','steins_gate','tower_of_god']
-# Doit être le même ordre que train_dataset.classes
+# Doit être dans le même ordre que train_dataset.classes
 class_names = ['Ghibli','One_piece','project_moon','steins_gate','tower_of_god']
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Transformations identiques à l'entraînement
 # Transformations identiques à l'entraînement
 transform = transforms.Compose([
     transforms.Resize((384, 384)),
@@ -24,7 +23,6 @@ transform = transforms.Compose([
                          [0.5, 0.5, 0.5])
 ])
 
-# Charger le modèle
 # Charger le modèle
 model = models.resnet18(pretrained=False)
 model.fc = nn.Linear(model.fc.in_features, len(class_names))

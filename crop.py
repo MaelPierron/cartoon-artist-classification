@@ -39,7 +39,7 @@ def split_into_two_squares(image_path, output_dir):
     square2.save(os.path.join(output_dir, f"{base_name}_square2.jpg"))
 
 
-def process_folder(input_dir, output_dir):
+def process_folder(input_dir, output_dir): # split les images des datasets en deux 
     os.makedirs(output_dir, exist_ok=True)
 
     for filename in os.listdir(input_dir):
