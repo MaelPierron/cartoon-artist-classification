@@ -4,8 +4,6 @@ import numpy as np
 from skimage.feature import (
     local_binary_pattern,
     hog,
-    graycomatrix,
-    graycoprops
 )
 import pandas as pd
 
