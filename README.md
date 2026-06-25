@@ -40,7 +40,7 @@ Two pipelines compared:
 
 | ResNet-18 | SVM | SVM + PLS |
 |-----------|-----|-----------|
-| ![](path/to/resnet_confusion.png) | ![](path/to/svm_confusion.png) | ![](path/to/svm_pls_confusion.png) |
+| ![](output/cnn.jpeg) | ![](output/SVM_sans_PLS.png) | ![](output/SVM.png) |
 
 **Feature space visualization:**
 
