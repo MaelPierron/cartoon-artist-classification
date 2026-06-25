@@ -19,6 +19,6 @@ labels = pd.factorize(y)[0]
 plt.figure(figsize=(8,6))
 plt.scatter(X_2d[:,0], X_2d[:,1], c=pd.factorize(y)[0])
 
-plt.title("Projection TNSE des features")
+plt.title("Projection TSNE des features")
 plt.colorbar()
 plt.show()
